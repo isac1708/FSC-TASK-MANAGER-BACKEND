@@ -1,17 +1,35 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const TaskModel = require('./src/models/task.model');
 
 const connectToDatabase = require('./src/database/mongoose.database');
 
 
 dotenv.config();
 const app = express();
+app.use(express.json());//permite que o express entenda requisições no formato json
 
 connectToDatabase();//chama a função connectToDatabase para conectar ao banco de dados
 
-app.get('/tasks', (req, res) => {
-    const tasks= [{description : "Estudar Programação", isCompleted : false}];
-    res.status(200).send(tasks);
+app.get('/tasks', async (req, res) => {
+   try{
+       const tasks = await TaskModel.find({});
+       res.send(tasks);
+   }catch(error){
+       res.status(500).send(error.message);
+   }
 });
+
+app.post('/tasks', async (req, res) => {
+   try{
+       const task = new TaskModel(req.body);
+       await task.save();
+       res.status(201).send(task);
+   }catch(error){
+    res.status(400).send(error.message);
+   }
+});//cria uma nova task
+
+
 app.listen(8000, () => console.log('Server is running on port 8000'));//listen faz a porta 8000 ficar aberta para receber requisições
     
