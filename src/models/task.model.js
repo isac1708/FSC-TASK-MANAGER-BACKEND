@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+// classe para criar modelos de dados
 
 const TaskShema = mongoose.Schema({
     description:{

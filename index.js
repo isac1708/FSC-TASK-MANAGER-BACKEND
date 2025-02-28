@@ -30,6 +30,18 @@ app.post('/tasks', async (req, res) => {
    }
 });//cria uma nova task
 
+app.delete('/tasks/:id', async (req, res) => {
+    try{
+        const task = await TaskModel.findByIdAndDelete(req.params.id);
+        if(!task){
+            res.status(404).send('Task not found');
+        }
+        res.status(204).send(task);
+    }catch(error){
+        res.status(500).send(error.message);
+    }
+});//deleta uma task
+
 
 app.listen(8000, () => console.log('Server is running on port 8000'));//listen faz a porta 8000 ficar aberta para receber requisições
     
