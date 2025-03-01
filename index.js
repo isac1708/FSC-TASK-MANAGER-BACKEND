@@ -41,6 +41,32 @@ app.post('/tasks', async (req, res) => {
    }
 });//cria uma nova task
 
+app.patch('/tasks/:id', async (req, res) => {
+    try{
+        const taskId=req.params.id;
+        const taskData=req.body;
+
+        const taskUpdate = await TaskModel.findById(taskId);
+        const allowedUpdates = ['isCompleted']; //campos que podem ser atualizados
+        const requestUpdates = Object.keys(taskData);
+
+        for(update of requestUpdates) {
+            if(allowedUpdates.includes(update)){
+                taskUpdate[update] = taskData[update];
+            }
+            else{
+                return res.status(400).send({error: 'Invalid update!'});
+            }
+        }//atualiza os campos permitidos
+
+        await taskUpdate.save();
+        return res.status(200).send(taskUpdate);
+
+    }catch(error){
+        res.status(500).send(error.message);
+    }
+});//atualiza uma task
+
 app.delete('/tasks/:id', async (req, res) => {
     try{
         const task = await TaskModel.findByIdAndDelete(req.params.id);
