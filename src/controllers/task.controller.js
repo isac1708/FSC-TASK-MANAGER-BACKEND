@@ -40,14 +40,14 @@ class TaskController{
 
     async updateTask(req,res){
         try{
-            const taskId=req.params.id;
-            const taskData=req.body;
+            const taskId= this.req.params.id;
+            const taskData= this.req.body;
     
             const taskUpdate = await TaskModel.findById(taskId);
             const allowedUpdates = ['isCompleted']; //campos que podem ser atualizados
             const requestUpdates = Object.keys(taskData);
     
-            for(update of requestUpdates) {
+            for(const update of requestUpdates) {
                 if(allowedUpdates.includes(update)){
                     taskUpdate[update] = taskData[update];
                 }
@@ -66,7 +66,7 @@ class TaskController{
 
     async deleteTask(req,res){
         try{
-            const task = await TaskModel.findByIdAndDelete(req.params.id);
+            const task = await TaskModel.findByIdAndDelete(this.req.params.id);
             if(!task){
                 this.res.status(404).send('Task not found');
             }
