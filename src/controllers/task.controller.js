@@ -1,4 +1,5 @@
 const TaskModel = require('../models/task.model');
+const {notFounderror} = require('../errors/mongodb.errors');
 
 class TaskController{
 
@@ -20,7 +21,7 @@ class TaskController{
         try{
             const task = await TaskModel.findById(req.params.id);
             if(!task){
-                this.res.status(404).send('Task not found');
+                return notFounderror(this.res,'Task not found');
             }
             this.res.send(task);
         }catch(error){
@@ -44,6 +45,9 @@ class TaskController{
             const taskData= this.req.body;
     
             const taskUpdate = await TaskModel.findById(taskId);
+            if(!taskUpdate){
+                return notFounderror(this.res,'Task not found');
+            }
             const allowedUpdates = ['isCompleted']; //campos que podem ser atualizados
             const requestUpdates = Object.keys(taskData);
     
@@ -68,7 +72,7 @@ class TaskController{
         try{
             const task = await TaskModel.findByIdAndDelete(this.req.params.id);
             if(!task){
-                this.res.status(404).send('Task not found');
+                return notFounderror(this.res,'Task not found');
             }
             this.res.status(204).send(task);
         }catch(error){
