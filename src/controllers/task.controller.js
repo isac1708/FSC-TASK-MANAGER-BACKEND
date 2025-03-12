@@ -1,5 +1,5 @@
 const TaskModel = require('../models/task.model');
-const {notFounderror} = require('../errors/mongodb.errors');
+const {notFounderror, objectIDerror } = require('../errors/mongodb.errors');
 const {notAllowedFieldsToUpdateError} = require('../errors/general.errors');
 
 class TaskController{
@@ -20,13 +20,17 @@ class TaskController{
 
     async getTaskById(req,res){
         try{
-            const task = await TaskModel.findById(req.params.id);
+            const task = await TaskModel.findById(this.req.params.id);
             if(!task){
                 return notFounderror(this.res,'Task not found');
             }
             this.res.send(task);
         }catch(error){
-            this.res.status(500).send(error.message);
+            if(error.name === 'CastError'){ //verifica se o erro é de ID inválido === é para comparar o tipo    
+                return objectIDerror(this.res);
+            }
+            
+            return this.res.status(500).send(error.message);
         }
     }
 
@@ -65,7 +69,10 @@ class TaskController{
             return this.res.status(200).send(taskUpdate);
     
         }catch(error){
-            this.res.status(500).send(error.message);
+            if(error.name === 'CastError'){
+                return objectIDerror(this.res);
+            }
+            return this.res.status(500).send(error.message);
         }
     }
 
@@ -77,7 +84,10 @@ class TaskController{
             }
             this.res.status(204).send(task);
         }catch(error){
-            this.res.status(500).send(error.message);
+            if(error.name === 'CastError'){
+                return objectIDerror(this.res);
+            }
+            return this.res.status(500).send(error.message);
         }
     }
 
